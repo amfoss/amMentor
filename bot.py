@@ -71,16 +71,19 @@ async def fetch_tasks_for_group(ctx, group_name):
                 mentee_tasks[last_mentee].append(
                     f"**{task}** - In Progress"
                 )
-        message = f"**Tasks from {group_name}**\n\n"
-        for mentee, tasks in mentee_tasks.items():
-            message += f"**{mentee}**\n-----------\n"
-            message += "\n".join(tasks) + "\n\n"
-        if len(message) > 2000:
-            await ctx.send("Output too long! Try checking fewer tasks.")
-        elif message.strip() == f"**Tasks from {group_name}**":
-            await ctx.send(f"No tasks found in {group_name}!")
+        embed = discord.Embed(title=f"📂 Tasks from {group_name}", color=discord.Color.blue())
+        embed.set_footer(text="Task Tracker Bot")
+
+        if not mentee_tasks:
+            embed.description = "🚫 No tasks found!"
         else:
-            await ctx.send(message)
+            for mentee, tasks in mentee_tasks.items():
+                embed.add_field(name=f"✅ {mentee}", value="\n".join(tasks), inline=False)
+
+        await ctx.send(embed=embed)
+
     except Exception as e:
-        await ctx.send(f"Error fetching data from {group_name}: {e}")
+        await ctx.send(f"⚠️ Error fetching data from {group_name}: {e}")
+
+# 🔥 Run the Bot
 bot.run(TOKEN)
