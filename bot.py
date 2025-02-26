@@ -78,12 +78,10 @@ async def fetch_tasks_for_group(ctx, group_name):
             embed.description = "No tasks found"
         else:
             for mentee, tasks in mentee_tasks.items():
-                embed.add_field(name=f"{mentee}", value="\n".join(tasks), inline=False)
+                embed.add_field(name=f"__**{mentee}**__", value="\n".join(tasks), inline=False)
 
         await ctx.send(embed=embed)
 
     except Exception as e:
         await ctx.send(f"Error fetching data from {group_name}: {e}")
-
-# 🔥 Run the Bot
 bot.run(TOKEN)
