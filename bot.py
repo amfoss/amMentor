@@ -71,19 +71,19 @@ async def fetch_tasks_for_group(ctx, group_name):
                 mentee_tasks[last_mentee].append(
                     f"**{task}** - In Progress"
                 )
-        embed = discord.Embed(title=f"📂 Tasks from {group_name}", color=discord.Color.blue())
-        embed.set_footer(text="Task Tracker Bot")
+        embed = discord.Embed(title=f"Tasks from {group_name}", color=discord.Color.orange())
+        embed.set_footer(text="Curriculum Tracker Bot")
 
         if not mentee_tasks:
-            embed.description = "🚫 No tasks found!"
+            embed.description = "No tasks found"
         else:
             for mentee, tasks in mentee_tasks.items():
-                embed.add_field(name=f"✅ {mentee}", value="\n".join(tasks), inline=False)
+                embed.add_field(name=f"{mentee}", value="\n".join(tasks), inline=False)
 
         await ctx.send(embed=embed)
 
     except Exception as e:
-        await ctx.send(f"⚠️ Error fetching data from {group_name}: {e}")
+        await ctx.send(f"Error fetching data from {group_name}: {e}")
 
 # 🔥 Run the Bot
 bot.run(TOKEN)
