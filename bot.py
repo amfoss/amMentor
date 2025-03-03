@@ -19,7 +19,18 @@ sheet = client.open("curriculum tracker")
 intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
-
+TASK_DEADLINES = {
+    "Task 00 Codeforces": None,  
+    "Task 01 Git": 5,
+    "Task 02 Web Dev basics": 10,
+    "Task 03 Build a Simple Shell": 12,
+    "Task 04 NOT A SRS DOC": 3,
+    "Task 05 WIREFRAME THE SKELETON": 5,
+    "Task 06 Figma Design Task": 7,
+    "Task 07 Frontend Development": 12,
+    "Task 08 Backend Development": 12,
+    "Task 09 Flutter Development": 10,
+}
 
 @bot.event
 async def on_ready():
@@ -45,7 +56,24 @@ async def taskstatus_group3(ctx):
 async def taskstatus_group4(ctx):
     await fetch_tasks_for_group(ctx, "GROUP4")
 
+@bot.command(name="curriculumdeadlines")
+async def curriculum_deadlines(ctx):
+    embed = discord.Embed(
+        title="📌 Curriculum Deadlines",
+        description="Here are the task deadlines for the curriculum:",
+        color=discord.Color.orange()
+    )
+    for task, days in TASK_DEADLINES.items():
+        if days is None:
+            deadline = "Until objectives are met"
+        else:
+            deadline = f"{days} days"
 
+        embed.add_field(name=task, value=deadline, inline=False)
+
+    embed.set_footer(text="")
+    
+    await ctx.send(embed=embed)
 async def fetch_tasks_for_group(ctx, group_name):
     try:
         available_sheets = [ws.title for ws in sheet.worksheets()]
