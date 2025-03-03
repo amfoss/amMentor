@@ -69,20 +69,25 @@ async def fetch_tasks_for_group(ctx, group_name):
             if last_mentee is None:
                 continue
             days_taken = ""
+            date_format = "%d/%m/%Y"
             if state.strip().lower() == "done" and start_date and end_date:
                 try:
-                    date_format = "%d/%m/%Y"
                     start = datetime.strptime(start_date, date_format)
                     end = datetime.strptime(end_date, date_format)
                     days_taken = f" ({(end - start).days} days)"
                 except ValueError:
                     pass
-            if state.strip().lower() == "done":
                 mentee_tasks[last_mentee].append(
                     f"✅️ **{task}** - time taken: {start_date} - {end_date}{days_taken}"
                 )
-            elif state.strip().lower() == "in progress":
-                mentee_tasks[last_mentee].append(f"🟠 **{task}** -In Progress, start date: {start_date}")
+            elif state.strip().lower() == "in progress" and start_date:
+                try:
+                    start = datetime.strptime(start_date, date_format)
+                    today_date = datetime.today()
+                    days = f" ({(today_date - start).days} days)"
+                except ValueError:
+                    days= ""  
+                mentee_tasks[last_mentee].append(f"🟠 **{task}** -In Progress, start date: {start_date}, days: {days}⃰")
         embed = discord.Embed(
             title=f"Tasks from {group_name}", color=discord.Color.orange()
         )
