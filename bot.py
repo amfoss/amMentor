@@ -69,7 +69,7 @@ async def fetch_tasks_for_group(ctx, group_name):
                 )
             elif state.strip().lower() == "in progress":
                 mentee_tasks[last_mentee].append(
-                    f"🟠 **{task}** -In Progress"
+                    f"🟠 **{task}** -In Progress, Started : {start_date}"
                 )
         embed = discord.Embed(title=f"Tasks from {group_name}", color=discord.Color.orange())
         embed.set_footer(text="Curriculum Tracker Bot")
