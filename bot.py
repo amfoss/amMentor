@@ -82,7 +82,7 @@ async def fetch_tasks_for_group(ctx, group_name):
                     f"✅️ **{task}** - time taken: {start_date} - {end_date}{days_taken}"
                 )
             elif state.strip().lower() == "in progress":
-                mentee_tasks[last_mentee].append(f"🟠 **{task}** -In Progress, Started on : {start_date}")
+                mentee_tasks[last_mentee].append(f"🟠 **{task}** -In Progress")
         embed = discord.Embed(
             title=f"Tasks from {group_name}", color=discord.Color.orange()
         )
