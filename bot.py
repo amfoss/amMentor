@@ -18,7 +18,7 @@ client = gspread.authorize(creds)
 sheet = client.open("curriculum tracker")
 intents = discord.Intents.default()
 intents.message_content = True
-bot = commands.Bot(command_prefix="/", intents=intents)
+bot = commands.Bot(command_prefix="!", intents=intents)
 TASK_DEADLINES = {
     "Task 00 Codeforces": None,  
     "Task 01 Git": 5,
