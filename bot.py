@@ -115,7 +115,7 @@ async def fetch_tasks_for_group(ctx, group_name):
                     days = f" ({(today_date - start).days} days)"
                 except ValueError:
                     days= ""  
-                mentee_tasks[last_mentee].append(f"🟠 **{task}** -In Progress, start date: {start_date}, days: {days}⃰")
+                mentee_tasks[last_mentee].append(f"🟠 **{task}** -In Progress, start date: {start_date}")
         embed = discord.Embed(
             title=f"Tasks from {group_name}", color=discord.Color.orange()
         )
