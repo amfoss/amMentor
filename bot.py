@@ -139,7 +139,10 @@ async def fetch_tasks_for_group(ctx, group_name):
 @bot.command(name="leaderboard")
 async def leaderboard(ctx):
     group_names = ["GROUP1", "GROUP2", "GROUP3", "GROUP4"]
-    mentee_time = {}
+    full_task_set = set(TASK_DEADLINES.keys())
+    mentee_days = {}
+    mentee_completed_tasks = {}
+
     date_format = "%d/%m/%Y"
 
     for group_name in group_names:
@@ -156,6 +159,7 @@ async def leaderboard(ctx):
                     last_mentee = mentee.strip()
                 if last_mentee is None:
                     continue
+                task = task.strip()
                 if state.strip().lower() == "done" and start_date and end_date:
                     try:
                         start = datetime.strptime(start_date, date_format)
@@ -163,9 +167,13 @@ async def leaderboard(ctx):
                         days_taken = (end - start).days
                         if days_taken < 0:
                             continue  # skip invalid dates
-                        if last_mentee not in mentee_time:
-                            mentee_time[last_mentee] = 0
-                        mentee_time[last_mentee] += days_taken
+
+                        if last_mentee not in mentee_days:
+                            mentee_days[last_mentee] = 0
+                            mentee_completed_tasks[last_mentee] = set()
+                        mentee_days[last_mentee] += days_taken
+                        mentee_completed_tasks[last_mentee].add(task)
+
                     except ValueError:
                         continue
 
@@ -173,21 +181,27 @@ async def leaderboard(ctx):
             await ctx.send(f"⚠️ Error processing {group_name}: {e}")
             continue
 
-    if not mentee_time:
-        await ctx.send("No data found for leaderboard.")
-        return
 
-    sorted_leaderboard = sorted(mentee_time.items(), key=lambda x: x[1])
+    qualified_mentees = {
+        mentee: total_days
+        for mentee, total_days in mentee_days.items()
+        if mentee_completed_tasks.get(mentee) == full_task_set
+    }
+
+    if not qualified_mentees:
+        await ctx.send("No mentees have completed all tasks.")
+        return
+    sorted_mentees = sorted(qualified_mentees.items(), key=lambda x: x[1])
     embed = discord.Embed(
-        title="🏆 Curriculum Leaderboard (Fastest Finishers)",
-        description="Ranked by total days taken to complete all tasks",
-        color=discord.Color.green()
+        title="🏆Leaderboard",
+        description="Mentees who completed all tasks — ranked by total days taken",
+        color=discord.Color.blue()
     )
 
-    for idx, (mentee, total_days) in enumerate(sorted_leaderboard, start=1):
+    for idx, (mentee, total_days) in enumerate(sorted_mentees, start=1):
         embed.add_field(name=f"#{idx} {mentee}", value=f"{total_days} days", inline=False)
 
-    embed.set_footer(text="Based on tasks marked as 'Done' across all groups")
+    embed.set_footer(text="Only mentees who completed all curriculum tasks")
     await ctx.send(embed=embed)
 
 bot.run(TOKEN)
