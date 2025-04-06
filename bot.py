@@ -56,6 +56,7 @@ async def taskstatus_group3(ctx):
 async def taskstatus_group4(ctx):
     await fetch_tasks_for_group(ctx, "GROUP4")
 
+
 @bot.command(name="curriculumdeadlines")
 async def curriculum_deadlines(ctx):
     embed = discord.Embed(
@@ -74,6 +75,8 @@ async def curriculum_deadlines(ctx):
     embed.set_footer(text="")
     
     await ctx.send(embed=embed)
+
+        
 async def fetch_tasks_for_group(ctx, group_name):
     try:
         available_sheets = [ws.title for ws in sheet.worksheets()]
@@ -133,6 +136,58 @@ async def fetch_tasks_for_group(ctx, group_name):
 
     except Exception as e:
         await ctx.send(f"Error fetching data from {group_name}: {e}")
+@bot.command(name="leaderboard")
+async def leaderboard(ctx):
+    group_names = ["GROUP1", "GROUP2", "GROUP3", "GROUP4"]
+    mentee_time = {}
+    date_format = "%d/%m/%Y"
 
+    for group_name in group_names:
+        try:
+            worksheet = sheet.worksheet(group_name)
+            data = worksheet.get_all_values()
+            last_mentee = None
+
+            for row in data[1:]:
+                if not any(row):
+                    continue
+                mentee, task, state, start_date, end_date, *_ = row
+                if mentee.strip():
+                    last_mentee = mentee.strip()
+                if last_mentee is None:
+                    continue
+                if state.strip().lower() == "done" and start_date and end_date:
+                    try:
+                        start = datetime.strptime(start_date, date_format)
+                        end = datetime.strptime(end_date, date_format)
+                        days_taken = (end - start).days
+                        if days_taken < 0:
+                            continue  # skip invalid dates
+                        if last_mentee not in mentee_time:
+                            mentee_time[last_mentee] = 0
+                        mentee_time[last_mentee] += days_taken
+                    except ValueError:
+                        continue
+
+        except Exception as e:
+            await ctx.send(f"⚠️ Error processing {group_name}: {e}")
+            continue
+
+    if not mentee_time:
+        await ctx.send("No data found for leaderboard.")
+        return
+
+    sorted_leaderboard = sorted(mentee_time.items(), key=lambda x: x[1])
+    embed = discord.Embed(
+        title="🏆 Curriculum Leaderboard (Fastest Finishers)",
+        description="Ranked by total days taken to complete all tasks",
+        color=discord.Color.green()
+    )
+
+    for idx, (mentee, total_days) in enumerate(sorted_leaderboard, start=1):
+        embed.add_field(name=f"#{idx} {mentee}", value=f"{total_days} days", inline=False)
+
+    embed.set_footer(text="Based on tasks marked as 'Done' across all groups")
+    await ctx.send(embed=embed)
 
 bot.run(TOKEN)
