@@ -160,13 +160,15 @@ async def leaderboard(ctx):
                 if last_mentee is None:
                     continue
                 task = task.strip()
+                if task.startswith("Task 00"):
+                    continue
                 if state.strip().lower() == "done" and start_date and end_date:
                     try:
                         start = datetime.strptime(start_date, date_format)
                         end = datetime.strptime(end_date, date_format)
                         days_taken = (end - start).days
                         if days_taken < 0:
-                            continue  # skip invalid dates
+                            continue  
 
                         if last_mentee not in mentee_days:
                             mentee_days[last_mentee] = 0
@@ -178,7 +180,7 @@ async def leaderboard(ctx):
                         continue
 
         except Exception as e:
-            await ctx.send(f"⚠️ Error processing {group_name}: {e}")
+            await ctx.send(f"Error processing {group_name}: {e}")
             continue
 
 
